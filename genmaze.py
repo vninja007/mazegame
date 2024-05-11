@@ -35,6 +35,7 @@ def genMaze(w, h, dist=0.6, protection=False):
                 if(r<=h*dist and c<=w*dist): continue
                 if([maze[rr][cc] for rr in range(r-1,r+2) for cc in range(c-1,c+2)].count('X')==7):
                     deadends.append([r,c])
+        if(len(deadends)==0): continue
         r, c = random.choice(deadends)
         maze[r][c] = '@'
         # print(maze)
