@@ -29,6 +29,7 @@ class Cam:
         self.rot = list(rot)
         self.update_rot()
         self.friction = friction
+        self.bullettrigger = 0
 
     def update_rot(self):
         self.rotX = math.sin(self.rot[0]),math.cos(self.rot[0])
@@ -42,31 +43,57 @@ class Cam:
             self.rot[0] = max(-1, self.rot[0])
             self.update_rot()
 
-    def update(self,dt,key):
+    def update(self,dt,key, cubes):
         global timedialation
         if key[pygame.K_LSHIFT]:
-            friction = self.friction*0.9
-            s = .55*dt
+            friction = 1
+            s = 1.1*dt
         else:
             friction = self.friction
             s = 1.1*dt
         x,y = s*math.sin(self.rot[1]),s*math.cos(self.rot[1])
-        timedialation = 0.15
-        if key[pygame.K_w]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
-        if key[pygame.K_s]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
-        if key[pygame.K_a]: self.vel[0]+=-y; self.vel[2]+=x; timedialation = 1
-        if key[pygame.K_d]: self.vel[0]+=y; self.vel[2]+=-x; timedialation = 1
+        timedialation = 0.3
+        if key[pygame.K_w] and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
+        if key[pygame.K_s] and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
+        if key[pygame.K_a] and not key[pygame.K_LSHIFT]: self.vel[0]+=-y; self.vel[2]+=x; timedialation = 1
+        if key[pygame.K_d] and not key[pygame.K_LSHIFT]: self.vel[0]+=y; self.vel[2]+=-x; timedialation = 1
+        if(key[pygame.K_w] or key[pygame.K_s] or key[pygame.K_a] or key[pygame.K_d]):
+            timedialation = 1
+        if key[pygame.K_b] and not self.bullettrigger:
+            self.bullettrigger = 1
+            bulletspeed = 3
+            beta = self.rot[1]
+            gamma = math.pi/2 + self.rot[0]
+            vz = bulletspeed*math.sin(gamma)*math.cos(beta)
+            vx = bulletspeed*math.sin(gamma)*math.sin(beta)
+            vy = -bulletspeed*math.cos(gamma)
+            cubes.append(Bullet(self.pos[0],self.pos[1], self.pos[2],vx,vy,vz))
+        if(not key[pygame.K_b] and self.bullettrigger):
+            self.bullettrigger = 0
         if(self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]):
             self.vel = [self.vel[i]*friction if i!=1 else self.vel[i] for i in range(3)]
-        self.vel[1] = self.vel[1] + 0.15 *timedialation
+            self.vel[1] = min(self.vel[1], 0)
+        else:
+            self.vel[1] = self.vel[1] + 0.15 *timedialation
+
+
         self.pos[0] += self.vel[0] *timedialation
         self.pos[1] += self.vel[1] *timedialation
         self.pos[2] += self.vel[2] *timedialation
+
+        if(timedialation!=1):
+            self.vel[1] = min(self.vel[1], .7)
+
         self.pos[1] = min(-2.5, self.pos[1])
         
         if(not key[pygame.K_LSHIFT]):  self.pos[1] = min(-3, self.pos[1])
         if key[pygame.K_SPACE] and (self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]): 
             self.vel[1]= -1.5
+        
+        for cube in cubes:
+            if(cube.whatami == 'bullet'):
+                cube.move(timedialation)
+
 
 
 
@@ -78,6 +105,30 @@ class Cube:
         self.colors = [(r,g,b)]*6
         self.whatami = whatami
 
+class Bullet(Cube):
+    def __init__(self, x, y, z, vx, vy, vz):
+        self.fx = x-0.08
+        self.fy = y+0.08
+        self.fz = z-0.08
+        self.tx = x+0.08
+        self.ty = y-0.08
+        self.tz = z+0.08
+        self.vx = vx
+        self.vy = vy
+        self.vz = vz
+        self.verts = (self.fx,self.fy,self.fz),(self.tx,self.fy,self.fz),(self.tx,self.ty,self.fz),(self.fx,self.ty,self.fz),(self.fx,self.fy,self.tz),(self.tx,self.fy,self.tz),(self.tx,self.ty,self.tz),(self.fx,self.ty,self.tz)
+        self.colors = [(0,0,255)]*6
+        self.whatami = "bullet"
+    def move(self, timedialation):
+        self.fx += self.vx*timedialation*0.2
+        self.tx += self.vx*timedialation*0.2
+        self.fy += self.vy*timedialation*0.2
+        self.ty += self.vy*timedialation*0.2
+        self.fz += self.vz*timedialation*0.2
+        self.tz += self.vz*timedialation*0.2
+        self.verts = (self.fx,self.fy,self.fz),(self.tx,self.fy,self.fz),(self.tx,self.ty,self.fz),(self.fx,self.ty,self.fz),(self.fx,self.fy,self.tz),(self.tx,self.fy,self.tz),(self.tx,self.ty,self.tz),(self.fx,self.ty,self.tz)
+        
+        
 # dont need to check if z is 0 (we clip z at min value)
 def get2D(v): return cx+int(v[0]/v[2]*projX),cy+int(v[1]/v[2]*projY)
 
@@ -118,7 +169,7 @@ def main():
     for r in range(len(maze)):
         for c in range(len(maze[0])):
             if(maze[r][c]=='X'):
-                cubes.append(Cube(r*7,0,c*7,r*7+7,-10,c*7+7,255,0,0, 'wall'))
+                cubes.append(Cube(r*7,0,c*7,r*7+7,-10,c*7+7,255,255,255, 'wall'))
             if(maze[r][c]=='@'):
                 cubes.append(Cube(r*7,0.001,c*7,r*7+7,1,c*7+7,0,255,0, 'goal'))
                 goalx1, goalz1, goalx2, goalz2 = r*7, c*7,r*7+7, c*7+7
@@ -126,12 +177,12 @@ def main():
     while True:
         # while(goalx1<cam.pos[0]<goalx2 and goalz1<cam.pos[2]<goalz2): pass
         # print(cam.rot)
-        # print(cam.pos)
+        # print(cam.pos, cam.rot)
         dt = fpsclock.tick()/1000
         pygame.display.set_caption('3D Graphics - FPS: %.2f'%fpsclock.get_fps())
 
         key = pygame.key.get_pressed()
-        cam.update(dt,key)
+        cam.update(dt,key, cubes)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: pygame.quit(); sys.exit()
