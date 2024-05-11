@@ -3,6 +3,7 @@ from genmaze import genMaze
 
 def lock_mouse(): pygame.event.get(); pygame.mouse.get_rel(); pygame.mouse.set_visible(0); pygame.event.set_grab(1)
 
+timedialation = 1
 
 def rotate2d(pos,rot): x,y = pos; s,c = rot; return x*c-y*s,y*c+x*s
 
@@ -42,6 +43,7 @@ class Cam:
             self.update_rot()
 
     def update(self,dt,key):
+        global timedialation
         if key[pygame.K_LSHIFT]:
             friction = self.friction*0.9
             s = .55*dt
@@ -49,16 +51,17 @@ class Cam:
             friction = self.friction
             s = 1.1*dt
         x,y = s*math.sin(self.rot[1]),s*math.cos(self.rot[1])
-        if key[pygame.K_w]: self.vel[0]+=x; self.vel[2]+=y
-        if key[pygame.K_s]: self.vel[0]+=-x; self.vel[2]+=-y
-        if key[pygame.K_a]: self.vel[0]+=-y; self.vel[2]+=x
-        if key[pygame.K_d]: self.vel[0]+=y; self.vel[2]+=-x
-
-        self.vel = [self.vel[i]*friction if i!=1 else self.vel[i] for i in range(3)]
-        self.vel[1] = self.vel[1] + 0.15
-        self.pos[0] += self.vel[0]
-        self.pos[1] += self.vel[1]
-        self.pos[2] += self.vel[2] 
+        timedialation = 0.15
+        if key[pygame.K_w]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
+        if key[pygame.K_s]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
+        if key[pygame.K_a]: self.vel[0]+=-y; self.vel[2]+=x; timedialation = 1
+        if key[pygame.K_d]: self.vel[0]+=y; self.vel[2]+=-x; timedialation = 1
+        if(self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]):
+            self.vel = [self.vel[i]*friction if i!=1 else self.vel[i] for i in range(3)]
+        self.vel[1] = self.vel[1] + 0.15 *timedialation
+        self.pos[0] += self.vel[0] *timedialation
+        self.pos[1] += self.vel[1] *timedialation
+        self.pos[2] += self.vel[2] *timedialation
         self.pos[1] = min(-2.5, self.pos[1])
         
         if(not key[pygame.K_LSHIFT]):  self.pos[1] = min(-3, self.pos[1])
