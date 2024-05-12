@@ -91,7 +91,7 @@ class Cam:
         
         if(not key[pygame.K_LSHIFT]):  self.pos[1] = min(-3, self.pos[1])
         if key[pygame.K_SPACE] and (self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]): 
-            self.vel[1]= -1.5
+            self.vel[1]= -1.4
         
 
         bullets = []
