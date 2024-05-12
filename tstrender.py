@@ -4,11 +4,8 @@ from genmaze import genMaze
 def lock_mouse(): pygame.event.get(); pygame.mouse.get_rel(); pygame.mouse.set_visible(0); pygame.event.set_grab(1)
 
 timedialation = 1
-height = 11
-width = 11
-
-wnumbers = [*range(1, width, 2)]
-hnumbers = [*range(1, height, 2)]
+height = 7
+width = 7
 
 def rotate2d(pos,rot): x,y = pos; s,c = rot; return x*c-y*s,y*c+x*s
 
@@ -58,7 +55,7 @@ class Cam:
             friction = self.friction
             s = 1.1*dt
         x,y = s*math.sin(self.rot[1]),s*math.cos(self.rot[1])
-        timedialation = 0.1
+        timedialation = 0.05
         if key[pygame.K_w] and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
         if key[pygame.K_s] and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
         if key[pygame.K_a] and not key[pygame.K_LSHIFT]: self.vel[0]+=-y; self.vel[2]+=x; timedialation = 1
@@ -67,7 +64,7 @@ class Cam:
             timedialation = 1
         if key[pygame.K_b] and not self.bullettrigger:
             self.bullettrigger = 1
-            bulletspeed = 3
+            bulletspeed = 100
             beta = self.rot[1]
             gamma = math.pi/2 + self.rot[0]
             vz = bulletspeed*math.sin(gamma)*math.cos(beta)
@@ -84,7 +81,7 @@ class Cam:
 
 
         self.pos[0] += self.vel[0] *timedialation
-        self.pos[1] += self.vel[1] *timedialation * 0.4
+        self.pos[1] += self.vel[1] *timedialation * 0.3
         self.pos[2] += self.vel[2] *timedialation
 
         if(timedialation!=1):
@@ -103,8 +100,6 @@ class Cam:
             if(cube.whatami == 'bullet'):
                 cube.move(timedialation)
                 bullets.append(cube)
-                if(Vector.magnitude(Vector.subtract(self.pos,(cube.fx,cube.fy,cube.fz))) > 50):
-                    cube.isdead = True
             if(cube.whatami == 'enemy'):
                 enemies.append(cube)
                 distvector = Vector.subtract(self.pos,(cube.x,cube.y,cube.z))
@@ -124,9 +119,10 @@ class Cam:
                     enemy.isdead = True
                     bullet.isdead = True
 
+                    wnumbers = [*range(1, width, 2)]
+                    hnumbers = [*range(1, height, 2)]
+                    print(wnumbers, hnumbers)
 
-
-                    cubes.append(Enemy(3.5 + 7*random.choice(wnumbers),-3,3.5 + 7*random.choice(hnumbers),2,0))
                     cubes.append(Enemy(3.5 + 7*random.choice(wnumbers),-3,3.5 + 7*random.choice(hnumbers),2,0))
 
         iptr = 0
@@ -162,12 +158,12 @@ class Bullet(Cube):
         self.whatami = "bullet"
         self.isdead = False
     def move(self, timedialation):
-        self.fx += self.vx*timedialation*0.2
-        self.tx += self.vx*timedialation*0.2
-        self.fy += self.vy*timedialation*0.2
-        self.ty += self.vy*timedialation*0.2
-        self.fz += self.vz*timedialation*0.2
-        self.tz += self.vz*timedialation*0.2
+        self.fx += self.vx*timedialation*0.01
+        self.tx += self.vx*timedialation*0.01
+        self.fy += self.vy*timedialation*0.01
+        self.ty += self.vy*timedialation*0.01
+        self.fz += self.vz*timedialation*0.01
+        self.tz += self.vz*timedialation*0.01
         self.verts = (self.fx,self.fy,self.fz),(self.tx,self.fy,self.fz),(self.tx,self.ty,self.fz),(self.fx,self.ty,self.fz),(self.fx,self.fy,self.tz),(self.tx,self.fy,self.tz),(self.tx,self.ty,self.tz),(self.fx,self.ty,self.tz)
 
 class Enemy(Cube):
