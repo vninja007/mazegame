@@ -8,7 +8,9 @@ height = 5
 width = 5
 initenimies = math.floor(height*width/20)
 health = 100
-
+maxfps = 30
+delay = 1/maxfps
+lasttick = time.time()
 def rotate2d(pos,rot): x,y = pos; s,c = rot; return x*c-y*s,y*c+x*s
 
 class Vector:
@@ -264,7 +266,7 @@ def getmap():
                 goalx1, goalz1, goalx2, goalz2 = r*7, c*7,r*7+7, c*7+7
     return cubes, goalx1, goalz1, goalx2, goalz2
 def main():
-    global projX,projY,cx,cy,cam,minZ, height, width
+    global projX,projY,cx,cy,cam,minZ, height, width, lasttick
     pygame.init()
     w,h = 320,240; cx,cy = w//2,h//2
     
@@ -286,6 +288,8 @@ def main():
             
     while True:
         # print(health)
+        while(time.time() - lasttick < delay): pass
+        lasttick = time.time()
         if(health<=0): pygame.quit(); sys.exit()
 
 
