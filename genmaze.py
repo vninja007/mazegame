@@ -3,6 +3,7 @@ import random
 
 def genMaze(w, h, dist=0.6, protection=False):
 
+    if(w==5 or h==5): dist=0.2
 # seed = 0
     maze = [['X']*w for i in range(h)]
     def visit(r, c, hasvisit):
