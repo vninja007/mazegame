@@ -115,8 +115,10 @@ class Cam:
                 cube.setrot(angle)
                 if(Vector.magnitude(distvector)<16):
                     cube.move(.04)
-                    # unit = Vector.multiply(1/Vector.magnitude(distvector),distvector)
-                    # cubes.append(Bullet(self.pos[0],self.pos[1], self.pos[2],unit[0],unit[1],unit[2]))
+                    if(time.time() - cube.lastbulletsent > 3):
+                        unit = Vector.multiply(1/Vector.magnitude(distvector),distvector)
+                        cube.lastbulletsent = time.time()
+                        cubes.append(Bullet(cube.x,cube.y, cube.z,unit[0]*200,unit[1]*200,unit[2]*200,'enemy'))
                     
                 if(Vector.magnitude(Vector.subtract(self.pos,(cube.x,cube.y,cube.z))) < 2):
                     if(key[pygame.K_LSHIFT]):
@@ -125,21 +127,40 @@ class Cam:
                     else:
                         health -= 1
 
-                
+        for enemy in enemies:
+            ex, ez = enemy.x, enemy.z
+            ex //= 7
+            ez //= 7
+            # print(ex, ez)
+            global maze
+            if(maze[int(ex)][int(ez)]=='X'):
+                enemy.isdead = True
 
+                wnumbers = [*range(1, width, 2)]
+                hnumbers = [*range(1, height, 2)]
+                # print(wnumbers, hnumbers)
+
+                cubes.append(Enemy(3.5 + 7*random.choice(wnumbers),-3,3.5 + 7*random.choice(hnumbers),2,0))
+        
         for bullet in bullets:
-            for enemy in enemies:
-                if(Vector.magnitude(Vector.subtract((bullet.fx,bullet.fy,bullet.fz),(enemy.x,enemy.y,enemy.z))) < 2.5 and not enemy.isdead):
-                    enemy.isdead = True
+            # print(bullet.source)
+            if(bullet.source == 'player'):
+                for enemy in enemies:
+                    if(Vector.magnitude(Vector.subtract((bullet.fx,bullet.fy,bullet.fz),(enemy.x,enemy.y,enemy.z))) < 2.5 and not enemy.isdead):
+                        enemy.isdead = True
+                        bullet.isdead = True
+                        health += 3
+                        health = min(health, 100)
+
+                        wnumbers = [*range(1, width, 2)]
+                        hnumbers = [*range(1, height, 2)]
+                        # print(wnumbers, hnumbers)
+
+                        cubes.append(Enemy(3.5 + 7*random.choice(wnumbers),-3,3.5 + 7*random.choice(hnumbers),2,0))
+            else:
+                if(Vector.magnitude(Vector.subtract((bullet.fx,bullet.fy,bullet.fz),(cam.pos[0],cam.pos[1],cam.pos[2]))) < 1):
+                    health -= 5
                     bullet.isdead = True
-                    health += 3
-                    health = min(health, 100)
-
-                    wnumbers = [*range(1, width, 2)]
-                    hnumbers = [*range(1, height, 2)]
-                    # print(wnumbers, hnumbers)
-
-                    cubes.append(Enemy(3.5 + 7*random.choice(wnumbers),-3,3.5 + 7*random.choice(hnumbers),2,0))
 
         iptr = 0
         while(iptr < len(cubes)):
@@ -159,7 +180,7 @@ class Cube:
         self.whatami = whatami
 
 class Bullet(Cube):
-    def __init__(self, x, y, z, vx, vy, vz):
+    def __init__(self, x, y, z, vx, vy, vz,source='player'):
         self.fx = x-0.08
         self.fy = y+0.08
         self.fz = z-0.08
@@ -169,6 +190,7 @@ class Bullet(Cube):
         self.vx = vx
         self.vy = vy
         self.vz = vz
+        self.source = source
         self.verts = (self.fx,self.fy,self.fz),(self.tx,self.fy,self.fz),(self.tx,self.ty,self.fz),(self.fx,self.ty,self.fz),(self.fx,self.fy,self.tz),(self.tx,self.fy,self.tz),(self.tx,self.ty,self.tz),(self.fx,self.ty,self.tz)
         self.colors = [(0,0,255)]*6
         self.whatami = "bullet"
@@ -193,6 +215,7 @@ class Enemy(Cube):
         self.theta = theta
         self.newverts()
         self.isdead = False
+        self.lastbulletsent = time.time()
     def rot(self,dtheta):
         self.theta += dtheta
         self.newverts()
@@ -260,6 +283,7 @@ def getmap():
         #     wnum, hnum = random.choice(wnumbers), random.choice(hnumbers)
         cubes.append(Enemy(3.5 + 7*wnum,-3,3.5 + 7*hnum,2,0))
     # print(i)
+    global maze
     maze = genMaze(height,width)
     for r in range(len(maze)):
         for c in range(len(maze[0])):
