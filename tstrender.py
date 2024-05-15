@@ -8,7 +8,8 @@ height = 5
 width = 5
 initenimies = math.floor(height*width/20)
 health = 100
-maxfps = 30
+maxfps = 24
+dupechance = 0.25
 delay = 1/maxfps
 lasttick = time.time()
 def rotate2d(pos,rot): x,y = pos; s,c = rot; return x*c-y*s,y*c+x*s
@@ -114,6 +115,9 @@ class Cam:
                 cube.setrot(angle)
                 if(Vector.magnitude(distvector)<16):
                     cube.move(.04)
+                    # unit = Vector.multiply(1/Vector.magnitude(distvector),distvector)
+                    # cubes.append(Bullet(self.pos[0],self.pos[1], self.pos[2],unit[0],unit[1],unit[2]))
+                    
                 if(Vector.magnitude(Vector.subtract(self.pos,(cube.x,cube.y,cube.z))) < 2):
                     if(key[pygame.K_LSHIFT]):
                         cube.isdead = True
@@ -125,7 +129,7 @@ class Cam:
 
         for bullet in bullets:
             for enemy in enemies:
-                if(Vector.magnitude(Vector.subtract((bullet.fx,bullet.fy,bullet.fz),(enemy.x,enemy.y,enemy.z))) < 2.5):
+                if(Vector.magnitude(Vector.subtract((bullet.fx,bullet.fy,bullet.fz),(enemy.x,enemy.y,enemy.z))) < 2.5 and not enemy.isdead):
                     enemy.isdead = True
                     bullet.isdead = True
                     health += 3
