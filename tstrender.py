@@ -100,9 +100,9 @@ class Cam:
     def events(self):
         print(leftpin.is_pressed, rightpin.is_pressed)
         if leftpin.is_pressed: 
-            self.rot[1]-=.05
+            self.rot[1]-=.2
         if rightpin.is_pressed:
-            self.rot[1]+=.05
+            self.rot[1]+=.2
         self.update_rot()
     def update(self,dt,key, cubes):
         global health
@@ -130,7 +130,7 @@ class Cam:
             vz = bulletspeed*math.sin(gamma)*math.cos(beta)
             vx = bulletspeed*math.sin(gamma)*math.sin(beta)
             vy = -bulletspeed*math.cos(gamma)
-            cubes.append(Bullet(self.pos[0],self.pos[1]-0.5, self.pos[2],vx,vy,vz))
+            cubes.append(Bullet(self.pos[0],self.pos[1]+0.5, self.pos[2],vx,vy,vz))
         if(not shootpin.is_pressed and self.bullettrigger):
             self.bullettrigger = 0
         if(self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]):
