@@ -6,10 +6,18 @@ from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import ili9341
 from genmaze import genMaze
 
+from gpiozero import Button
 
 cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
 reset_pin = digitalio.DigitalInOut(board.D24)
+
+leftpin = Button(26)
+downpin = Button(19)
+uppin = Button(13)
+rightpin = Button(6)
+shootpin = Button(5)
+
 
 
 BAUDRATE = 24000000
@@ -90,19 +98,11 @@ class Cam:
         self.rotY = math.sin(self.rot[1]),math.cos(self.rot[1])
 
     def events(self,key):
-        if key[pygame.K_a]: 
-            self.rot[1]+=.05
-        if key[pygame.K_d]:
+        if leftpin.is_pressed: 
             self.rot[1]-=.05
+        if rightpin.is_pressed:
+            self.rot[1]+=.05
         self.update_rot()
-        # if event.type == pygame.MOUSEMOTION:
-        #     x,y = event.rel; x/=200; y/=200
-        #     self.rot[0]+=y; self.rot[1]+=x
-        #     self.rot[0] = min(1.57, self.rot[0])
-        #     self.rot[0] = max(-1.57, self.rot[0])
-        #     print(self.rot)
-        #     self.update_rot()
-
     def update(self,dt,key, cubes):
         global health
         global timedialation
@@ -115,13 +115,13 @@ class Cam:
         x,y = s*math.sin(self.rot[1]),s*math.cos(self.rot[1])
         timedialation = 0.05
         
-        if key[pygame.K_w] and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
-        if key[pygame.K_s] and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
+        if uppin.is_pressed and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
+        if downpin.is_pressed and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
 
         print(self.rot)
-        if(key[pygame.K_w] or key[pygame.K_s]):
+        if(uppin.is_pressed or downpin.is_pressed):
             timedialation = 1
-        if key[pygame.K_b] and not self.bullettrigger:
+        if shootpin.is_pressed and not self.bullettrigger:
             self.bullettrigger = 1
             bulletspeed = 200
             beta = self.rot[1]
@@ -130,7 +130,7 @@ class Cam:
             vx = bulletspeed*math.sin(gamma)*math.sin(beta)
             vy = -bulletspeed*math.cos(gamma)
             cubes.append(Bullet(self.pos[0],self.pos[1], self.pos[2],vx,vy,vz))
-        if(not key[pygame.K_b] and self.bullettrigger):
+        if(not shootpin.is_pressed and self.bullettrigger):
             self.bullettrigger = 0
         if(self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]):
             self.vel = [self.vel[i]*friction if i!=1 else self.vel[i] for i in range(3)]
