@@ -97,7 +97,8 @@ class Cam:
         self.rotX = math.sin(self.rot[0]),math.cos(self.rot[0])
         self.rotY = math.sin(self.rot[1]),math.cos(self.rot[1])
 
-    def events(self,key):
+    def events(self):
+        print(leftpin.is_pressed, rightpin.is_pressed)
         if leftpin.is_pressed: 
             self.rot[1]-=.05
         if rightpin.is_pressed:
@@ -404,7 +405,7 @@ def main():
                 elif event.key == pygame.K_9: minZ = 9
                 elif event.key == pygame.K_MINUS: minZ=max(0.4,minZ-1)
                 elif event.key == pygame.K_EQUALS: minZ+=1
-            cam.events(key)
+            cam.events()
 
         screen.fill((128,128,255))
 
