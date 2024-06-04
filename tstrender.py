@@ -100,9 +100,9 @@ class Cam:
     def events(self):
         print(leftpin.is_pressed, rightpin.is_pressed)
         if leftpin.is_pressed: 
-            self.rot[1]-=.2
+            self.rot[1]-=.3
         if rightpin.is_pressed:
-            self.rot[1]+=.2
+            self.rot[1]+=.3
         self.update_rot()
     def update(self,dt,key, cubes):
         global health
@@ -484,6 +484,7 @@ def main():
 
         # healthbar = pygame.Rect(0,0,int(health) * 70/100, 25)
         # healthgap = pygame.Rect(0,0,70, 25)
+        draw.text((5, 5), str(health), font=font, fill="#FF00FF")
         # draw.rect(screen, pygame.Color(76,10,10),healthgap)
         # draw.rect(screen, pygame.Color(0,255,0),healthbar)
 
