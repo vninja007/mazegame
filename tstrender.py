@@ -362,9 +362,9 @@ def main():
     cubes, goalx1, goalz1, goalx2, goalz2  = getmap()
             
     while True:
-        draw.rectangle((0, 0, width, height), outline=0, fill=0)
+        
         # print(health)
-        while(time.time() - lasttick < delay): pass
+        while(time.time() - lasttick < delay): draw.rectangle((0, 0, width, height), outline=0, fill=0)
         lasttick = time.time()
         if(health<=0): pygame.quit(); sys.exit()
 
