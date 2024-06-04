@@ -130,7 +130,7 @@ class Cam:
             vz = bulletspeed*math.sin(gamma)*math.cos(beta)
             vx = bulletspeed*math.sin(gamma)*math.sin(beta)
             vy = -bulletspeed*math.cos(gamma)
-            cubes.append(Bullet(self.pos[0],self.pos[1], self.pos[2],vx,vy,vz))
+            cubes.append(Bullet(self.pos[0],self.pos[1]-0.5, self.pos[2],vx,vy,vz))
         if(not shootpin.is_pressed and self.bullettrigger):
             self.bullettrigger = 0
         if(self.pos[1]==-3 and not key[pygame.K_LSHIFT] or self.pos[1]==-2.5 and key[pygame.K_LSHIFT]):
@@ -405,7 +405,7 @@ def main():
                 elif event.key == pygame.K_9: minZ = 9
                 elif event.key == pygame.K_MINUS: minZ=max(0.4,minZ-1)
                 elif event.key == pygame.K_EQUALS: minZ+=1
-            cam.events()
+        cam.events()
 
         screen.fill((128,128,255))
 
