@@ -388,7 +388,7 @@ def getmap():
                 goalx1, goalz1, goalx2, goalz2 = r*7, c*7,r*7+7, c*7+7
     return cubes, goalx1, goalz1, goalx2, goalz2
 def main():
-    global projX,projY,cx,cy,cam,minZ, height, width, lasttick
+    global projX,projY,cx,cy,cam,minZ, height, width, lasttick,health
     pygame.init()
     w,h = 320,240; cx,cy = w//2,h//2
     
