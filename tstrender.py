@@ -421,6 +421,7 @@ def main():
         # sort and render all polygons
         order = sorted(range(len(face_list)),key=lambda i:depth[i],reverse=1)
         for i in order:
+            print(face_list[i])
             try: pygame.draw.polygon(screen,face_color[i],face_list[i])
             except: pass
 
