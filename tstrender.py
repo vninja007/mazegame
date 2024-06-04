@@ -422,6 +422,7 @@ def main():
             cam.vel = [0,0,0]
             height += 2
             width += 2
+            health = 100
             cubes, goalx1, goalz1, goalx2, goalz2 = getmap()
 
         # print(cam.rot)
@@ -430,7 +431,7 @@ def main():
         pygame.display.set_caption('3D Graphics - FPS: %.2f'%fpsclock.get_fps())
 
         key = pygame.key.get_pressed()
-        if(key[pygame.K_r]):
+        if(downpin.is_pressed() and leftpin.is_pressed() and rightpin.is_pressed() and shootpin.is_pressed() and not uppin.is_pressed()):
             cam.pos = [10.5,-3,10.5]
             cam.vel = [0,0,0]
         cam.update(dt,key, cubes)
