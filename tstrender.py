@@ -1,5 +1,51 @@
 import pygame, sys, os, math, random, time
+import subprocess
+import digitalio
+import board
+from PIL import Image, ImageDraw, ImageFont
+from adafruit_rgb_display import ili9341
 from genmaze import genMaze
+
+
+cs_pin = digitalio.DigitalInOut(board.CE0)
+dc_pin = digitalio.DigitalInOut(board.D25)
+reset_pin = digitalio.DigitalInOut(board.D24)
+
+
+BAUDRATE = 24000000
+
+# Setup SPI bus using hardware SPI:
+spi = board.SPI()
+
+disp = ili9341.ILI9341(
+    spi,
+    rotation=90,  # 2.2", 2.4", 2.8", 3.2" ILI9341
+    cs=cs_pin,
+    dc=dc_pin,
+    rst=reset_pin,
+    baudrate=BAUDRATE,
+)
+if disp.rotation % 180 == 90:
+    height = disp.width  # we swap height/width to rotate it to landscape!
+    width = disp.height
+else:
+    width = disp.width  # we swap height/width to rotate it to landscape!
+    height = disp.height
+
+image = Image.new("RGB", (width, height))
+
+# Get drawing object to draw on image.
+draw = ImageDraw.Draw(image)
+
+# Draw a black filled box to clear the image.
+draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
+
+disp.image(image)
+
+# First define some constants to allow easy positioning of text.
+padding = -2
+x = 0
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
 
 def lock_mouse(): pygame.event.get(); pygame.mouse.get_rel(); pygame.mouse.set_visible(0); pygame.event.set_grab(1)
 
@@ -315,6 +361,7 @@ def main():
     cubes, goalx1, goalz1, goalx2, goalz2  = getmap()
             
     while True:
+        draw.rectangle((0, 0, width, height), outline=0, fill=0)
         # print(health)
         while(time.time() - lasttick < delay): pass
         lasttick = time.time()
@@ -422,15 +469,19 @@ def main():
         order = sorted(range(len(face_list)),key=lambda i:depth[i],reverse=1)
         for i in order:
             print(face_list[i])
-            try: pygame.draw.polygon(screen,face_color[i],face_list[i])
+            try: draw.polygon(face_list[i], outline=face_color[i], fill=face_color[i])
             except: pass
+            # try: pygame.draw.polygon(screen,face_color[i],face_list[i])
+            # except: pass
 
-        healthbar = pygame.Rect(0,0,int(health) * 70/100, 25)
-        healthgap = pygame.Rect(0,0,70, 25)
-        pygame.draw.rect(screen, pygame.Color(76,10,10),healthgap)
-        pygame.draw.rect(screen, pygame.Color(0,255,0),healthbar)
 
-        pygame.display.flip()
+        # healthbar = pygame.Rect(0,0,int(health) * 70/100, 25)
+        # healthgap = pygame.Rect(0,0,70, 25)
+        # draw.rect(screen, pygame.Color(76,10,10),healthgap)
+        # draw.rect(screen, pygame.Color(0,255,0),healthbar)
+
+        disp.image(image)
+        # pygame.display.flip()
 
 
 

@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "RL2D")(type "KiCad")(uri "C:/Users/pytho/Documents/robo/RocketLeague2D/schema/RL2D/libs/RL2D.pretty")(options "")(descr ""))
+  (lib (name "verycold")(type "KiCad")(uri "${KIPRJMOD}/verycold.pretty")(options "")(descr ""))
+)
