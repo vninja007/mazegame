@@ -89,13 +89,13 @@ class Cam:
         self.rotX = math.sin(self.rot[0]),math.cos(self.rot[0])
         self.rotY = math.sin(self.rot[1]),math.cos(self.rot[1])
 
-    def events(self,event):
-        if event.type == pygame.MOUSEMOTION:
-            x,y = event.rel; x/=200; y/=200
-            self.rot[0]+=y; self.rot[1]+=x
-            self.rot[0] = min(1.57, self.rot[0])
-            self.rot[0] = max(-1.57, self.rot[0])
-            self.update_rot()
+    # def events(self,event):
+    #     if event.type == pygame.MOUSEMOTION:
+    #         x,y = event.rel; x/=200; y/=200
+    #         self.rot[0]+=y; self.rot[1]+=x
+    #         self.rot[0] = min(1.57, self.rot[0])
+    #         self.rot[0] = max(-1.57, self.rot[0])
+    #         self.update_rot()
 
     def update(self,dt,key, cubes):
         global health
@@ -112,9 +112,10 @@ class Cam:
         if key[pygame.K_w] and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
         if key[pygame.K_s] and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
         if key[pygame.K_a]: 
-            self.rot[1]+=1
+            self.rot[1]+=.05
         if key[pygame.K_d]:
-            self.rot[1]-=1
+            self.rot[1]-=.05
+        self.update_rot()
         print(self.rot)
         if(key[pygame.K_w] or key[pygame.K_s]):
             timedialation = 1
@@ -401,7 +402,7 @@ def main():
                 elif event.key == pygame.K_9: minZ = 9
                 elif event.key == pygame.K_MINUS: minZ=max(0.4,minZ-1)
                 elif event.key == pygame.K_EQUALS: minZ+=1
-            cam.events(event)
+            # cam.events(event)
 
         screen.fill((128,128,255))
 
