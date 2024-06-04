@@ -112,9 +112,10 @@ class Cam:
         if key[pygame.K_w] and not key[pygame.K_LSHIFT]: self.vel[0]+=x; self.vel[2]+=y; timedialation = 1
         if key[pygame.K_s] and not key[pygame.K_LSHIFT]: self.vel[0]+=-x; self.vel[2]+=-y; timedialation = 1
         if key[pygame.K_a]: 
-            self.rot[1]+=.1
+            self.rot[1]+=1
         if key[pygame.K_d]:
-            self.rot[1]-=.1
+            self.rot[1]-=1
+        print(self.rot)
         if(key[pygame.K_w] or key[pygame.K_s]):
             timedialation = 1
         if key[pygame.K_b] and not self.bullettrigger:
@@ -470,7 +471,7 @@ def main():
         # sort and render all polygons
         order = sorted(range(len(face_list)),key=lambda i:depth[i],reverse=1)
         for i in order:
-            print(face_list[i])
+            # print(face_list[i])
             try: draw.polygon(face_list[i], outline=face_color[i], fill=face_color[i])
             except: pass
             # try: pygame.draw.polygon(screen,face_color[i],face_list[i])
